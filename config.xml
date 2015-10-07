@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<widget xmlns   = "http://www.w3.org/ns/widgets"
+        xmlns:gap   = "http://phonegap.com/ns/1.0"
+        id          = "com.phonegap.example"
+        versionCode = ""
+        version     = "0.2.0" >
+
+    <!-- versionCode is optional and Android only -->
+
+    <name>Recipe ionic App</name>
+
+    <description>
+        Cool app.
+    </description>
+
+    <author href="https://build.phonegap.com/apps/1695219/" email="vistavnoy.oleg@mail.ru">
+        Oleg V
+    </author>
+
+    <icon src="icon.png" />
+
+</widget>
