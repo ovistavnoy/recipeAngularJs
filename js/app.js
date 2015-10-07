@@ -78,9 +78,10 @@ app.config(function($stateProvider) {
         });
 });
 
-app.controller('HomeCtrl', ['$scope', 'RecipeService', '$timeout',
-    function($scope, RecipeService, $timeout) {
+app.controller('HomeCtrl', ['$scope', 'RecipeService', '$timeout', 'CategoryService',
+    function($scope, RecipeService, $timeout, CategoryService) {
         $scope.turnOnSearch = false;
+        $scope.categories = CategoryService.getCategories();
         $scope.exit = function() {
             navigator.app.exitApp();
         };
@@ -114,7 +115,15 @@ app.controller('RecipesCtrl', ['$scope', '$stateParams', 'CategoryService', 'Rec
 
         $scope.addRecipe = function() {
             $state.go('form-recipe-category', {categoryId: $scope.categoryId})
-        }
+        };
+
+        $scope.predicate = 'name';
+        $scope.reverse = true;
+        $scope.test = function(predicate) {
+            console.log(predicate)
+            $scope.reverse = ($scope.predicate === predicate) ? !$scope.reverse : false;
+            $scope.predicate = predicate;
+        };
     }
 ]);
 

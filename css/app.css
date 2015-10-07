@@ -6,4 +6,6 @@ textarea{resize: none;}
 .has-errors {border-bottom: 3px solid #B83E2C;}
 .no-errors {border-bottom: 3px solid green;}
 .main-recipe-list{padding-top: 5px;padding-bottom: 5px;}
-.main-content{  background: url("../images/background.jpg") no-repeat center center fixed;  -webkit-background-size: cover;  -moz-background-size: cover;  background-size: cover;  }
+.main-content{  background: url("../img/background.jpg") no-repeat center center fixed;  -webkit-background-size: cover;  -moz-background-size: cover;  background-size: cover;  }
+.no-margin{margin: 0;}
+.margin-right{margin-right: 15px}
