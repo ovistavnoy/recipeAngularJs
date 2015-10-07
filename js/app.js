@@ -28,7 +28,8 @@ app.directive('focusMe', function($timeout) {
     };
 });
 
-app.config(function($stateProvider) {
+app.config(function($stateProvider, $urlRouterProvider) {
+    $urlRouterProvider.otherwise('/');
     $stateProvider
         .state('home', {
             url: '/',
