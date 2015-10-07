@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1, minimum-scale=1, maximum-scale=1">
+    <meta charset="utf-8">
+    <title>Рецепты</title>
+
+    <link rel="stylesheet" href="css/ionic.min.css">
+    <link rel="stylesheet" href="css/app.css">
+
+    <script src="js/ionic.bundle.min.js"></script>
+    <script src="js/angular-locale_ru-ru.min.js"></script>
+    <script src="js/ngStorage.min.js"></script>
+    <script src="js/app.js"></script>
+</head>
+<body ng-app="app" >
+
+<ion-nav-view></ion-nav-view>
+
+<script type="text/ng-template" id="home.tpl">
+    <ion-header-bar class="bar-positive">
+        <a href="" ng-click="exit()" class="button icon-left ion-power button-assertive"></a>
+        <h1 class="title">Мои рецепты</h1>
+        <a ng-click="showSearch()" class="button icon-left ion-android-search button-energized"></a>
+    </ion-header-bar>
+    <ion-view view-title="Главная">
+    <ion-content>
+        <div class="list padding" ng-show="turnOnSearch">
+            <label class="item item-input">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input name="search" focus-me type="text" ng-model="search.name" placeholder="Поиск рецептов">
+            </label>
+        </div>
+        <div class="list" ng-show="search.name.length >= 2">
+            <a class="item item-icon-right main-recipe-list" ng-repeat="recipe in recipes | filter:search | orderBy:'name'" href="#/recipe/{{recipe.id}}">
+                {{recipe.name}}
+                <p>{{recipe.categoryName}}</p>
+                <i class="icon ion-ios-arrow-right"></i>
+            </a>
+            <span ng-show="(recipes | filter:search).length == 0" class="text-center"><p>Рецепты не найдены</p></span>
+        </div>
+
+    </ion-content>
+    </ion-view>
+    <div class="tabs tabs-icon-top tabs-positive">
+        <a class="tab-item" href="#/form-recipe/">
+            <i class="icon ion-plus"></i>
+            Добавить рецепт
+        </a>
+        <a class="tab-item" href="#/categories/">
+            <i class="icon ion-navicon-round"></i>
+            Каталог рецептов
+        </a>
+        <a class="tab-item" ng-click="clearBase()">
+            <i class="icon ion-trash-a"></i>
+            Очистить базу
+        </a>
+    </div>
+
+</script>
+
+
+<script type="text/ng-template" id="categories.tpl">
+    <ion-header-bar class="bar-positive">
+        <a href="#/" class="button icon-left ion-home button-energized"></a>
+        <h1 class="title">Категории</h1>
+        <a href="#/favorites/" class="button icon-left ion-android-favorite button-energized">Любимые</a>
+    </ion-header-bar>
+    <ion-view view-title="Категории">
+    <ion-content>
+        <div class="list">
+            <a class="item" ng-repeat="category in categories | orderBy:'name'" href="#/recipes/{{category.id}}">
+                {{category.name}}
+                <span class="badge badge-assertive">{{category.count}}</span>
+            </a>
+        </div>
+    </ion-content>
+    </ion-view>
+</script>
+
+
+<script type="text/ng-template" id="recipes.tpl">
+    <ion-header-bar class="bar-positive">
+        <a href="#/categories/" class="button icon-left ion-navicon-round button-energized"></a>
+        <h1 class="title">{{categoryName}}</h1>
+        <a href="" ng-click="addRecipe()" class="button icon-left ion-plus button-energized"></a>
+    </ion-header-bar>
+
+    <ion-view view-title="Рецепты">
+        <ion-content>
+        <div class="list" ng-if="recipes.length">
+            <label class="item item-input">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input type="text" ng-model="search.name" placeholder="Поиск рецептов">
+            </label>
+            <a class="item" ng-repeat="recipe in recipes | filter:search | orderBy:'name'" href="#/recipe/{{recipe.id}}">
+                {{recipe.name}}
+            </a>
+        </div>
+        <div ng-if="!recipes.length" class="text-center"><br><p>Пока не добавлены рецепты в "{{categoryName}}"</p></div>
+        </ion-content>
+    </ion-view>
+</script>
+
+
+<script type="text/ng-template" id="recipe.tpl">
+
+    <ion-header-bar class="bar-positive">
+        <a href="#/recipes/{{recipe.categoryId}}" class="button icon-left ion-navicon-round button-energized">{{recipe.categoryName}}</a>
+        <!--<a href="" ng-click="back()" class="button ion-chevron-left ion-navicon-round button-energized"></a>-->
+        <h1 class="title">Рецепт</h1>
+        <div class="buttons">
+            <a href="" ng-click="toggleFavorite()" ng-class="recipe.isFav ? 'ion-android-favorite' : 'ion-android-favorite-outline'"class="button icon-right button-energized"></a>
+            <a href="" ng-click="doEdit()" class="button icon-right ion-android-create button-energized"></a>
+            <a href="" ng-click="showConfirm()" class="button icon-right ion-trash-a button-energized"></a>
+        </div>
+    </ion-header-bar>
+
+    <ion-view view-title="Рецепт">
+        <ion-content class="padding">
+        <h3 class="text-center">{{recipe.name}}</h3>
+        <b>Категория:</b> {{recipe.categoryName}}<br>
+        <b>Добавлено:</b> {{recipe.datetime | date:'dd MMMM yyyy HH:mm'}}<br>
+        <span><b>Ингридиенты:</b> <p ng-bind-html="recipe.ingredients | nl2br"></p></span>
+        <span><b>Описание:</b> <p ng-bind-html="recipe.description | nl2br"></p></span>
+        <span ng-if="recipe.comment"><b>Комментарий:</b> <p ng-bind-html="recipe.comment | nl2br"></p></span>
+        <b>Пробовал Олежка?</b> {{recipe.usedText}}<br><br>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script type="text/ng-template" id="form-recipe.tpl">
+    <ion-header-bar class="bar-positive">
+        <a href="#/" class="button icon-left ion-home button-energized"></a>
+        <h1 ng-if="action=='create'" class="title">Новый рецепт</h1>
+        <h1 ng-if="action=='edit'" class="title">Изменение рецепта</h1>
+    </ion-header-bar>
+    <ion-view view-title="Форма рецепта">
+        <ion-content>
+        <form name="recipeForm" novalidate="" ng-submit="submitForm(recipeForm, recipe)">
+            <input type="hidden" name="id" ng-model="recipe.id">
+            <div class="list">
+                <label class="item item-input" ng-class="{ 'has-errors' : (submited || recipeForm.name.$touched) && recipeForm.name.$invalid, 'no-errors' : (submited || recipeForm.name.$touched) && recipeForm.name.$valid}">
+                    <input type="text" name="name" ng-model="recipe.name" placeholder="Название" focus-me required>
+                    <div class="error" ng-show="(submited || recipeForm.name.$touched) && recipeForm.name.$error.required">
+                        Введите название.
+                    </div>
+                </label>
+
+                <label class="item item-input item-select" ng-class="{ 'has-errors' : (submited || recipeForm.categoryId.$touched) && recipeForm.categoryId.$invalid, 'no-errors' : (submited || recipeForm.categoryId.$touched) && recipeForm.categoryId.$valid}">
+                    <div class="input-label" ng-hide="(submited || recipeForm.categoryId.$touched) && recipeForm.categoryId.$error.required">
+                        Категория
+                    </div>
+                    <div class="error" ng-show="(submited || recipeForm.categoryId.$touched) && recipeForm.categoryId.$error.required">
+                        Выберите категорию.
+                    </div>
+                    <select ng-model="recipe.categoryId" name="categoryId" ng-options="category.id as category.name for category in categories" required>
+                        <option value="">Выберите категорию</option>
+                    </select>
+                </label>
+
+                <label class="item item-input" ng-class="{ 'has-errors' : (submited || recipeForm.ingredients.$touched) && recipeForm.ingredients.$invalid, 'no-errors' : (submited || recipeForm.ingredients.$touched) && recipeForm.ingredients.$valid}">
+                    <textarea rows="5" ng-model="recipe.ingredients" name="ingredients" placeholder="Ингридиенты" required></textarea>
+                    <div class="error" ng-show="(submited || recipeForm.ingredients.$touched) && recipeForm.ingredients.$error.required">
+                        Введите ингридиенты.
+                    </div>
+                </label>
+
+                <label class="item item-input" ng-class="{ 'has-errors' : (submited || recipeForm.description.$touched) && recipeForm.description.$invalid, 'no-errors' : (submited || recipeForm.description.$touched) && recipeForm.description.$valid}">
+                    <textarea rows="5" ng-model="recipe.description" name="description" placeholder="Описание" required></textarea>
+                    <div class="error" ng-show="(submited || recipeForm.description.$touched) && recipeForm.description.$error.required">
+                        Введите описание.
+                    </div>
+                </label>
+
+                <label class="item item-input" ng-class="{ 'has-errors' : (submited || recipeForm.comment.$touched) && recipeForm.comment.$invalid, 'no-errors' : (submited || recipeForm.comment.$touched) && recipeForm.comment.$valid}">
+                    <textarea rows="5" ng-model="recipe.comment" name="comment" placeholder="Комментарий"></textarea>
+                </label>
+
+                <ion-checkbox ng-model="recipe.used">Пробовал Олежка?</ion-checkbox>
+
+                <div class="buttons text-right padding">
+                    <button ng-click="reset()" class="button button-default">Очистить форму</button>
+                    <button ng-if="action=='create'" type="submit" class="button button-positive">Добавить</button>
+                    <button ng-if="action=='edit'" type="submit" class="button button-positive">Изменить</button>
+                </div>
+            </div>
+        </form>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script type="text/javascript" src="cordova.js"></script>
+
+</body>
+</html>

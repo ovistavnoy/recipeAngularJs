@@ -1,0 +1,8 @@
+.content{margin-top: 44px;}
+.text-center{text-align: center;}
+.item-select{min-height: 50px;}
+textarea{resize: none;}
+.error {padding: 10px 16px;  font-family: "Arial Black", Gadget, sans-serif;  font-size: 11px;  text-transform: uppercase;  color: red;  vertical-align: middle;  }
+.has-errors {border-bottom: 3px solid #B83E2C;}
+.no-errors {border-bottom: 3px solid green;}
+.main-recipe-list{padding-top: 5px;padding-bottom: 5px;}
