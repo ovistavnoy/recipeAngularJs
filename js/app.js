@@ -18,6 +18,21 @@ app.filter('nl2br', ['$sce', function ($sce) {
     };
 }]);
 
+app.filter('list', ['$sce', function ($sce) {
+    return function (text) {
+        var result = '';
+        if(text) {
+            var li = text.split(/\n/g);
+            result += '<ul class="list-ingredients">';
+            for(var i=0; i<li.length; i++) {
+                result += '<li>'+li[i]+'</li>';
+            }
+            result += '</ul>';
+        }
+        return $sce.trustAsHtml(result);
+    };
+}]);
+
 app.directive('focusMe', function($timeout) {
     return {
         link: function(scope, element, attrs) {
@@ -28,7 +43,8 @@ app.directive('focusMe', function($timeout) {
     };
 });
 
-app.config(function($stateProvider, $urlRouterProvider) {
+app.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+    $ionicConfigProvider.views.maxCache(0);
     $urlRouterProvider.otherwise('/');
     $stateProvider
         .state('home', {
@@ -37,7 +53,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
             controller: 'HomeCtrl'
         })
         .state('categories', {
-            cache: false,
             url: '/categories/',
             templateUrl: 'categories.tpl',
             controller: 'CategoriesCtrl'
@@ -48,31 +63,26 @@ app.config(function($stateProvider, $urlRouterProvider) {
             controller: 'FavoritesCtrl'
         })
         .state('recipes', {
-            cache: false,
             url: '/recipes/:categoryId',
             templateUrl: 'recipes.tpl',
             controller: 'RecipesCtrl'
         })
         .state('recipe', {
-            cache: false,
             url: '/recipe/:recipeId',
             templateUrl: 'recipe.tpl',
             controller: 'RecipeCtrl'
         })
         .state('form-recipe', {
-            cache: false,
             url: '/form-recipe/',
             templateUrl: 'form-recipe.tpl',
             controller: 'FormRecipeCtrl'
         })
         .state('form-recipe-id', {
-            cache: false,
             url: '/form-recipe/recipeId-:recipeId',
             templateUrl: 'form-recipe.tpl',
             controller: 'FormRecipeCtrl'
         })
         .state('form-recipe-category', {
-            cache: false,
             url: '/form-recipe/categoryId-:categoryId',
             templateUrl: 'form-recipe.tpl',
             controller: 'FormRecipeCtrl'
@@ -108,8 +118,9 @@ app.controller('CategoriesCtrl', ['$scope', 'CategoryService',
     }
 ]);
 
-app.controller('RecipesCtrl', ['$scope', '$stateParams', 'CategoryService', 'RecipeService', '$state',
-    function($scope, $stateParams, CategoryService, RecipeService, $state) {
+app.controller('RecipesCtrl', ['$scope', '$stateParams', 'CategoryService', 'RecipeService', '$state', '$timeout',
+    function($scope, $stateParams, CategoryService, RecipeService, $state, $timeout) {
+        $scope.turnOnSearch = false;
         $scope.categoryId = $stateParams.categoryId;
         $scope.categoryName = CategoryService.getCategoryById($scope.categoryId);
         $scope.recipes = RecipeService.getRecipes({categoryId: $scope.categoryId});
@@ -118,10 +129,24 @@ app.controller('RecipesCtrl', ['$scope', '$stateParams', 'CategoryService', 'Rec
             $state.go('form-recipe-category', {categoryId: $scope.categoryId})
         };
 
+        $scope.showSearch = function() {
+            $scope.turnOnSearch = !$scope.turnOnSearch;
+            $scope.search = {name: ''};
+            if($scope.turnOnSearch) {
+                $timeout(function() {
+                    document.querySelector('input[name=search]').focus()
+                });
+            }
+        };
+
+        $scope.setSearchUsed = function(value) {
+            value = parseInt(value) ? true : false;
+            $scope.search.used = $scope.search.used != value ? value : undefined;
+        };
+
         $scope.predicate = 'name';
         $scope.reverse = true;
         $scope.test = function(predicate) {
-            console.log(predicate)
             $scope.reverse = ($scope.predicate === predicate) ? !$scope.reverse : false;
             $scope.predicate = predicate;
         };
@@ -253,7 +278,6 @@ app.service('RecipeService', function (categoriesConstant, $localStorage) {
             },
             getRecipes: function(params) {
                 var result = [];
-               // console.log(angular.$isEmpty(params));
                 for(var i=0; i<$localStorage.recipes.length; i++) {
                     if(params == undefined ||
                         (params.categoryId != undefined && params.categoryId == $localStorage.recipes[i].categoryId) ||

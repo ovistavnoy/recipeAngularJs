@@ -28,7 +28,7 @@
         <div class="list padding no-margin" ng-show="turnOnSearch">
             <label class="item item-input item-select">
                 <i class="icon ion-search placeholder-icon"></i>
-                <input name="search" focus-me type="text" ng-model="search.name" placeholder="Поиск рецептов">
+                <input name="search" type="text" ng-model="search.name" placeholder="Поиск рецептов">
                 <select ng-model="search.categoryId" ng-change="search.categoryId = search.categoryId ? search.categoryId : undefined" ng-options="category.id as category.name for category in categories">
                     <option value="">Все категории</option>
                 </select>
@@ -87,21 +87,31 @@
     <ion-header-bar class="bar-positive">
         <a href="#/categories/" class="button icon-left ion-navicon-round button-energized"></a>
         <h1 class="title">{{categoryName}}</h1>
-        <a href="" ng-click="addRecipe()" class="button icon-left ion-plus button-energized"></a>
+        <a ng-click="showSearch()" class="button icon-left ion-android-search button-energized"></a>
+        <!--<a href="" ng-click="addRecipe()" class="button icon-left ion-plus button-energized"></a>-->
     </ion-header-bar>
 
     <ion-view view-title="Рецепты">
         <ion-content>
-        <div class="list" ng-if="recipes.length">
+        <div class="list no-margin" ng-show="turnOnSearch">
+
+            <div class="item search-bar-recipes button-bar row-no-padding padding-left">
+                    Пробывал Олежек?&nbsp;
+                    <a ng-click="setSearchUsed(1)" ng-class="{'active': search.used == true}" class="button button-small">Да</a>
+                    <a ng-click="setSearchUsed(0)" ng-class="{'active': search.used == false}" class="button button-small">Нет</a>
+            </div>
             <label class="item item-input">
                 <i class="icon ion-search placeholder-icon"></i>
-                <input type="text" ng-model="search.name" placeholder="Поиск рецептов">
+                <input name="search" type="text" ng-model="search.name" placeholder="Поиск рецептов">
             </label>
+        </div>
+
+        <div class="list" ng-if="recipes.length">
             <span class="item item-divider">
-                <div class="text-left" style="float: left;" ng-click="test('name')">Название
+                <div class="text-hr text-left" style="float: left;" ng-click="test('name')">Название
                     <i ng-show="predicate === 'name'" class="icon" ng-class="{'ion-arrow-down-b': reverse, 'ion-arrow-up-b': !reverse}"></i>
                 </div>
-                <div class="text-right" ng-click="test('datetime')">
+                <div class="text-hr text-right" ng-click="test('datetime')">
                     <i ng-show="predicate === 'datetime'" class="icon" ng-class="{'ion-arrow-down-b': reverse, 'ion-arrow-up-b': !reverse}"></i>
                     Добавлен
                 </div>
@@ -110,11 +120,10 @@
                 {{recipe.name}}
                 <i class="icon ion-ios-arrow-right"></i>
             </a>
+            <div ng-show="(recipes | filter:search).length == 0" class="text-center margin-top"><p>По заданным параметрам<br> рецептов не найдено.</p></div>
         </div>
-        <div ng-if="!recipes.length" class="text-center">
-            <br>
-            <p>Не найдено рецептов в "{{categoryName}}".</p>
-            <p>Желаете <a href="" ng-click="addRecipe()">добавить</a>?</p>
+        <div ng-if="!recipes.length" class="text-center margin-top">
+            <p>Нет рецептов в "{{categoryName}}".<br>Желаете <a href="" ng-click="addRecipe()">добавить</a>?</p>
         </div>
         </ion-content>
     </ion-view>
@@ -141,7 +150,7 @@
         <h3 class="text-center">{{recipe.name}}</h3>
         <b>Категория:</b> {{recipe.categoryName}}<br>
         <b>Добавлено:</b> {{recipe.datetime | date:'dd MMMM yyyy HH:mm'}}<br>
-        <span><b>Ингридиенты:</b> <p ng-bind-html="recipe.ingredients | nl2br"></p></span>
+        <span><b>Ингридиенты:</b> <p ng-bind-html="recipe.ingredients | list"></p></span>
         <span><b>Описание:</b> <p ng-bind-html="recipe.description | nl2br"></p></span>
         <span ng-if="recipe.comment"><b>Комментарий:</b> <p ng-bind-html="recipe.comment | nl2br"></p></span>
         <b>Пробовал Олежка?</b> {{recipe.usedText}}<br><br>
@@ -171,30 +180,30 @@
                     <div class="input-label" ng-hide="(submited || recipeForm.categoryId.$touched) && recipeForm.categoryId.$error.required">
                         Категория
                     </div>
-                    <div class="error" ng-show="(submited || recipeForm.categoryId.$touched) && recipeForm.categoryId.$error.required">
+                    <label class="error" for="category" style="padding: 0;" ng-show="(submited || recipeForm.categoryId.$touched) && recipeForm.categoryId.$error.required">
                         Выберите категорию.
-                    </div>
-                    <select ng-model="recipe.categoryId" name="categoryId" ng-options="category.id as category.name for category in categories" required>
-                        <option value="">Выберите категорию</option>
+                    </label>
+                    <select ng-model="recipe.categoryId" name="categoryId" id="category" ng-options="category.id as category.name for category in categories" required>
+                        <option value="">Не выбрано</option>
                     </select>
                 </label>
 
                 <label class="item item-input" ng-class="{ 'has-errors' : (submited || recipeForm.ingredients.$touched) && recipeForm.ingredients.$invalid, 'no-errors' : (submited || recipeForm.ingredients.$touched) && recipeForm.ingredients.$valid}">
-                    <textarea rows="5" ng-model="recipe.ingredients" name="ingredients" placeholder="Ингридиенты" required></textarea>
-                    <div class="error" ng-show="(submited || recipeForm.ingredients.$touched) && recipeForm.ingredients.$error.required">
-                        Введите ингридиенты.
-                    </div>
+                    <textarea rows="4" ng-model="recipe.ingredients" id="ingredients" name="ingredients" placeholder="Ингридиенты" required></textarea>
+                </label>
+                <label class="error item" for="ingredients" ng-show="(submited || recipeForm.ingredients.$touched) && recipeForm.ingredients.$error.required">
+                    Введите ингридиенты.
                 </label>
 
                 <label class="item item-input" ng-class="{ 'has-errors' : (submited || recipeForm.description.$touched) && recipeForm.description.$invalid, 'no-errors' : (submited || recipeForm.description.$touched) && recipeForm.description.$valid}">
-                    <textarea rows="5" ng-model="recipe.description" name="description" placeholder="Описание" required></textarea>
-                    <div class="error" ng-show="(submited || recipeForm.description.$touched) && recipeForm.description.$error.required">
-                        Введите описание.
-                    </div>
+                    <textarea rows="4" ng-model="recipe.description" id="description" name="description" placeholder="Описание" required></textarea>
+                </label>
+                <label class="error item" for="description" ng-show="(submited || recipeForm.description.$touched) && recipeForm.description.$error.required">
+                    Введите описание.
                 </label>
 
-                <label class="item item-input" ng-class="{ 'has-errors' : (submited || recipeForm.comment.$touched) && recipeForm.comment.$invalid, 'no-errors' : (submited || recipeForm.comment.$touched) && recipeForm.comment.$valid}">
-                    <textarea rows="5" ng-model="recipe.comment" name="comment" placeholder="Комментарий"></textarea>
+                <label class="item item-input" ng-class="{'has-errors' : (submited || recipeForm.comment.$touched) && recipeForm.comment.$invalid, 'no-errors' : (submited || recipeForm.comment.$touched) && recipeForm.comment.$valid}">
+                    <textarea rows="3" ng-model="recipe.comment" name="comment" placeholder="Комментарий"></textarea>
                 </label>
 
                 <ion-checkbox ng-model="recipe.used">Пробовал Олежка?</ion-checkbox>
