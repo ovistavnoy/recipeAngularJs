@@ -208,6 +208,8 @@
 
                 <ion-checkbox ng-model="recipe.used">Пробовал Олежка?</ion-checkbox>
 
+                <a ng-click="capturePhoto()" class="button">Добавить фото</a>
+
                 <div class="buttons text-right padding">
                     <button ng-click="reset()" class="button button-default">Очистить форму</button>
                     <button ng-if="action=='create'" type="submit" class="button button-positive">Добавить</button>
@@ -220,6 +222,7 @@
 </script>
 
 <script type="text/javascript" src="cordova.js"></script>
+<script type="text/javascript" src="camera.js"></script>
 
 </body>
 </html>

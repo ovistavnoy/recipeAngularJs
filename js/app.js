@@ -223,6 +223,21 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
                 $state.go('recipe', {recipeId: recipeId});
             }
         };
+
+        $scope.capturePhoto = function() {
+            navigator.camera.getPicture($scope.uploadSuccess, null, {sourceType:1, quality:60});
+        };
+
+        $scope.uploadSuccess = function(data) {
+            cameraPic.src = "data:image/jpeg;base64," + data;
+            // Successful upload to the server
+            navigator.notification.alert(
+                'Your Photo has been uploaded',  // message
+                okay,                           // callback
+                'Photo Uploaded',              // title
+                'OK'                          // buttonName
+            );
+        };
     }
 ]);
 

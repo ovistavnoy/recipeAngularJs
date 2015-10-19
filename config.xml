@@ -16,13 +16,7 @@
         Oleg V
     </author>
 
-    <feature name="Camera">
-        <param name="ios-package" value="CDVCamera" />
-    </feature>
-
-    <feature name="Camera">
-        <param name="android-package" value="org.apache.cordova.camera.CameraLauncher" />
-    </feature>
+    <gap:plugin name="com.phonegap.plugins.camera" />
 
     <icon src="icon.png" />
     <icon gap:density="ldpi" gap:platform="android" src="res/icon/android/icon-36-ldpi.png" />
