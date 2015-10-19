@@ -169,14 +169,14 @@
         <form name="recipeForm" novalidate="" ng-submit="submitForm(recipeForm, recipe)">
             <input type="hidden" name="id" ng-model="recipe.id">
             <div class="list">
-                <label class="item item-input" ng-class="{ 'has-errors' : (submited || recipeForm.name.$touched) && recipeForm.name.$invalid, 'no-errors' : (submited || recipeForm.name.$touched) && recipeForm.name.$valid}">
+                <label class="item item-input" ng-class="{'has-errors' : (submited || recipeForm.name.$touched) && recipeForm.name.$invalid, 'no-errors' : (submited || recipeForm.name.$touched) && recipeForm.name.$valid}">
                     <input type="text" name="name" ng-model="recipe.name" placeholder="Название" focus-me required>
                     <div class="error" ng-show="(submited || recipeForm.name.$touched) && recipeForm.name.$error.required">
                         Введите название.
                     </div>
                 </label>
 
-                <label class="item item-input item-select" ng-class="{ 'has-errors' : (submited || recipeForm.categoryId.$touched) && recipeForm.categoryId.$invalid, 'no-errors' : (submited || recipeForm.categoryId.$touched) && recipeForm.categoryId.$valid}">
+                <label class="item item-input item-select" ng-class="{'has-errors' : (submited || recipeForm.categoryId.$touched) && recipeForm.categoryId.$invalid, 'no-errors' : (submited || recipeForm.categoryId.$touched) && recipeForm.categoryId.$valid}">
                     <div class="input-label" ng-hide="(submited || recipeForm.categoryId.$touched) && recipeForm.categoryId.$error.required">
                         Категория
                     </div>
@@ -188,22 +188,22 @@
                     </select>
                 </label>
 
-                <label class="item item-input" ng-class="{ 'has-errors' : (submited || recipeForm.ingredients.$touched) && recipeForm.ingredients.$invalid, 'no-errors' : (submited || recipeForm.ingredients.$touched) && recipeForm.ingredients.$valid}">
-                    <textarea rows="4" ng-model="recipe.ingredients" id="ingredients" name="ingredients" placeholder="Ингридиенты" required></textarea>
+                <label class="item item-input" ng-class="{'has-errors' : (submited || recipeForm.ingredients.$touched) && recipeForm.ingredients.$invalid, 'no-errors' : (submited || recipeForm.ingredients.$touched) && recipeForm.ingredients.$valid}">
+                    <textarea ng-model="recipe.ingredients" id="ingredients" name="ingredients" placeholder="Ингридиенты" required></textarea>
                 </label>
                 <label class="error item" for="ingredients" ng-show="(submited || recipeForm.ingredients.$touched) && recipeForm.ingredients.$error.required">
                     Введите ингридиенты.
                 </label>
 
-                <label class="item item-input" ng-class="{ 'has-errors' : (submited || recipeForm.description.$touched) && recipeForm.description.$invalid, 'no-errors' : (submited || recipeForm.description.$touched) && recipeForm.description.$valid}">
-                    <textarea rows="4" ng-model="recipe.description" id="description" name="description" placeholder="Описание" required></textarea>
+                <label class="item item-input" ng-class="{'has-errors' : (submited || recipeForm.description.$touched) && recipeForm.description.$invalid, 'no-errors' : (submited || recipeForm.description.$touched) && recipeForm.description.$valid}">
+                    <textarea ng-model="recipe.description" id="description" name="description" placeholder="Описание" required></textarea>
                 </label>
                 <label class="error item" for="description" ng-show="(submited || recipeForm.description.$touched) && recipeForm.description.$error.required">
                     Введите описание.
                 </label>
 
                 <label class="item item-input" ng-class="{'has-errors' : (submited || recipeForm.comment.$touched) && recipeForm.comment.$invalid, 'no-errors' : (submited || recipeForm.comment.$touched) && recipeForm.comment.$valid}">
-                    <textarea rows="3" ng-model="recipe.comment" name="comment" placeholder="Комментарий"></textarea>
+                    <textarea ng-model="recipe.comment" name="comment" placeholder="Комментарий"></textarea>
                 </label>
 
                 <ion-checkbox ng-model="recipe.used">Пробовал Олежка?</ion-checkbox>
