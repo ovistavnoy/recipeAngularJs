@@ -16,7 +16,7 @@
         Oleg V
     </author>
 
-    <gap:plugin name="com.phonegap.plugins.camera" />
+    <feature name="http://api.phonegap.com/1.0/camera"/>
 
     <icon src="icon.png" />
     <icon gap:density="ldpi" gap:platform="android" src="res/icon/android/icon-36-ldpi.png" />
