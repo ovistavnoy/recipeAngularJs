@@ -248,7 +248,7 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
 
                     //Move the file to permanent storage
                     $cordovaFile.moveFile(cordova.file.tempDirectory, currentName, cordova.file.dataDirectory, newFileName).then(function(success){
-                        $scope.images.push(cordova.file.dataDirectory + '/' + newFileName);
+                        $scope.images.push(success.nativeURL);
                         //success.nativeURL will contain the path to the photo in permanent storage, do whatever you wish with it, e.g:
                         //createPhoto(success.nativeURL);
 
