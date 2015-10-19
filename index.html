@@ -208,7 +208,13 @@
 
                 <ion-checkbox ng-model="recipe.used">Пробовал Олежка?</ion-checkbox>
 
-                <a ng-click="capturePhoto()" class="button">Добавить фото</a>
+
+                <label ng-click="capturePhoto()" class="item">
+                    <a href="">Добавить фото</a>
+                    <div ng-repeat="image in images">
+                        <div>{{image}}</div>
+                    </div>
+                </label>
 
                 <div class="buttons text-right padding">
                     <button ng-click="reset()" class="button button-default">Очистить форму</button>

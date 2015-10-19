@@ -198,6 +198,7 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
         $scope.submited = false;
         $scope.categories = CategoryService.getCategories();
         $scope.action = 'create';
+        $scope.images = [];
 
         if($stateParams.categoryId != undefined) {
             $scope.recipe = {categoryId: parseInt($stateParams.categoryId)};
@@ -229,14 +230,7 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
         };
 
         $scope.uploadSuccess = function(data) {
-            cameraPic.src = "data:image/jpeg;base64," + data;
-            // Successful upload to the server
-            navigator.notification.alert(
-                'Your Photo has been uploaded',  // message
-                okay,                           // callback
-                'Photo Uploaded',              // title
-                'OK'                          // buttonName
-            );
+            $scope.images.push(data);
         };
     }
 ]);
