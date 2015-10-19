@@ -22,10 +22,4 @@
     <icon gap:density="hdpi" gap:platform="android" src="res/icon/android/icon-72-hdpi.png" />
     <icon gap:density="xhdpi" gap:platform="android" src="res/icon/android/icon-96-xhdpi.png" />
 
-    <feature name="Camera">
-        <param name="android-package" value="org.apache.cordova.camera.CameraLauncher" />
-    </feature>
-
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
 </widget>
