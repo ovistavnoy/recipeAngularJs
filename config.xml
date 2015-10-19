@@ -16,6 +16,7 @@
         Oleg V
     </author>
 
+    <gap:plugin name="org.apache.cordova.file" />
     <gap:plugin name="org.apache.cordova.camera" />
 
     <icon src="icon.png" />

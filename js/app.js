@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ionic', 'ngStorage']);
+var app = angular.module('app', ['ionic', 'ngCordova', 'ngStorage']);
 
 app.constant('categoriesConstant', [
     {id: 1, name: 'Торты'},
@@ -193,8 +193,8 @@ app.controller('RecipeCtrl', ['$scope', '$window', '$stateParams', 'RecipeServic
     }
 ]);
 
-app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', '$state', '$stateParams',
-    function($scope, RecipeService, CategoryService, $state, $stateParams) {
+app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', '$state', '$stateParams', '$cordovaCamera', '$cordovaFile',
+    function($scope, RecipeService, CategoryService, $state, $stateParams, $cordovaCamera, $cordovaFile) {
         $scope.submited = false;
         $scope.categories = CategoryService.getCategories();
         $scope.action = 'create';
@@ -226,12 +226,44 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
         };
 
         $scope.capturePhoto = function() {
-            navigator.camera.getPicture($scope.uploadSuccess, null, {sourceType:1, quality:60});
+            try {
+                var options = {
+                    quality: 100,
+                    destinationType: Camera.DestinationType.FILE_URI,
+                    sourceType: Camera.PictureSourceType.CAMERA,
+                    encodingType: Camera.EncodingType.JPEG,
+                    cameraDirection: 1,
+                    saveToPhotoAlbum: true
+                };
+
+                $cordovaCamera.getPicture(options).then(function(imagePath){
+
+                    //Grab the file name of the photo in the temporary directory
+                    var currentName = imagePath.replace(/^.*[\\\/]/, '');
+
+                    //Create a new name for the photo
+                    var d = new Date(),
+                        n = d.getTime(),
+                        newFileName = n + ".jpg";
+
+                    //Move the file to permanent storage
+                    $cordovaFile.moveFile(cordova.file.tempDirectory, currentName, cordova.file.dataDirectory, newFileName).then(function(success){
+                        $scope.images.push(cordova.file.dataDirectory + '/' + newFileName);
+                        //success.nativeURL will contain the path to the photo in permanent storage, do whatever you wish with it, e.g:
+                        //createPhoto(success.nativeURL);
+
+                    }, function(error){
+                        //an error occured
+                    });
+
+                }, function(error){
+                    //An error occured
+                });
+            } catch (err) {
+                alert(err.message)
+            }
         };
 
-        $scope.uploadSuccess = function(data) {
-            $scope.images.push(data);
-        };
     }
 ]);
 

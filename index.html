@@ -8,8 +8,11 @@
     <link rel="stylesheet" href="css/ionic.min.css">
     <link rel="stylesheet" href="css/app.css">
 
+    <script type="text/javascript" src="cordova.js"></script>
+
     <script src="js/ionic.bundle.min.js"></script>
     <script src="js/angular-locale_ru-ru.min.js"></script>
+    <script src="js/ngCordova.min.js"></script>
     <script src="js/ngStorage.min.js"></script>
     <script src="js/app.js"></script>
 </head>
@@ -212,7 +215,7 @@
                 <label ng-click="capturePhoto()" class="item">
                     <a href="">Добавить фото</a>
                     <div ng-repeat="image in images">
-                        <div>{{image}}</div>
+                        <img ng-src="{{image}}" alt="image"/>
                     </div>
                 </label>
 
@@ -226,9 +229,6 @@
         </ion-content>
     </ion-view>
 </script>
-
-<script type="text/javascript" src="cordova.js"></script>
-<script type="text/javascript" src="camera.js"></script>
 
 </body>
 </html>
