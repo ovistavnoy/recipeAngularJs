@@ -155,6 +155,7 @@ app.controller('RecipesCtrl', ['$scope', '$stateParams', 'CategoryService', 'Rec
 
 app.controller('FavoritesCtrl', ['$scope', '$stateParams', 'CategoryService', 'RecipeService',
     function($scope, $stateParams, CategoryService, RecipeService) {
+        $scope.notAdd = true;
         $scope.categoryName = 'Любимые';
         $scope.recipes = RecipeService.getFromFavRecipe();
     }

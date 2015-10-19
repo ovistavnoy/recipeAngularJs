@@ -40,7 +40,7 @@
                 <p>{{recipe.categoryName}}</p>
                 <i class="icon ion-ios-arrow-right"></i>
             </a>
-            <span ng-show="(recipes | filter:search).length == 0" class="text-center"><p>Рецепты не найдены</p></span>
+            <span ng-show="(recipes | filter:search).length == 0" class="text-center"><p class="white">Рецепты не найдены</p></span>
         </div>
 
     </ion-content>
@@ -123,7 +123,7 @@
             <div ng-show="(recipes | filter:search).length == 0" class="text-center margin-top"><p>По заданным параметрам<br> рецептов не найдено.</p></div>
         </div>
         <div ng-if="!recipes.length" class="text-center margin-top">
-            <p>Нет рецептов в "{{categoryName}}".<br>Желаете <a href="" ng-click="addRecipe()">добавить</a>?</p>
+            <p>Нет рецептов в "{{categoryName}}".<br><span ng-hide="notAdd">Желаете <a href="" ng-click="addRecipe()">добавить</a>?</span></p>
         </div>
         </ion-content>
     </ion-view>
