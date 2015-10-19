@@ -225,6 +225,7 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
             }
         };
 
+        $scope.status = 'not upload';
         $scope.capturePhoto = function() {
             try {
                 var options = {
@@ -237,6 +238,7 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
                 };
 
                 $cordovaCamera.getPicture(options).then(function(imagePath){
+                    $scope.status = 'photo upload in temp directory';
 
                     //Grab the file name of the photo in the temporary directory
                     var currentName = imagePath.replace(/^.*[\\\/]/, '');
@@ -248,15 +250,18 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
 
                     //Move the file to permanent storage
                     $cordovaFile.moveFile(cordova.file.tempDirectory, currentName, cordova.file.dataDirectory, newFileName).then(function(success){
+                        $scope.status = 'photo moved in app by url: '+success.nativeURL;
                         $scope.images.push(success.nativeURL);
                         //success.nativeURL will contain the path to the photo in permanent storage, do whatever you wish with it, e.g:
                         //createPhoto(success.nativeURL);
 
                     }, function(error){
+                        $scope.status = 'photo move error';
                         //an error occured
                     });
 
                 }, function(error){
+                    $scope.status = 'photo upload error';
                     //An error occured
                 });
             } catch (err) {
