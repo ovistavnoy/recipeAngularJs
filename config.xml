@@ -3,8 +3,8 @@
 <widget xmlns   = "http://www.w3.org/ns/widgets"
         xmlns:gap   = "http://phonegap.com/ns/1.0"
         id          = "com.phonegap.example"
-        versionCode = "0.5.0"
-        version     = "0.5.0" >
+        versionCode = "0.5.1"
+        version     = "0.5.1" >
 
     <name>Recipe ionic App</name>
 
