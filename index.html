@@ -59,6 +59,10 @@
             <i class="icon ion-navicon-round"></i>
             Каталог рецептов
         </a>
+        <a class="tab-item" href="#/test">
+            <i class="icon ion-social-codepen-outline"></i>
+            Тест формы
+        </a>
         <a class="tab-item" ng-click="clearBase()">
             <i class="icon ion-trash-a"></i>
             Очистить базу
@@ -160,6 +164,32 @@
             <span ng-if="recipe.comment"><b>Комментарий:</b> <p ng-bind-html="recipe.comment | nl2br"></p></span>
             <b>Пробовал Олежка?</b> {{recipe.usedText}}<br>
             <ion-gallery ion-gallery-items="recipe.images" ion-gallery-row="4"></ion-gallery>
+        </ion-content>
+    </ion-view>
+</script>
+
+<script type="text/ng-template" id="test.tpl">
+
+    <ion-header-bar class="bar-positive">
+        <a href="#/" class="button icon-left ion-home button-energized"></a>
+    </ion-header-bar>
+
+    <ion-view view-title="Рецепт">
+        <ion-content class="padding">
+            <div class="list">
+                <label class="item item-input">
+                    <input type="text" placeholder="First Name">
+                </label>
+                <label class="item item-input">
+                    <input type="text" placeholder="Last Name">
+                </label>
+                <label class="item item-input">
+                    <textarea placeholder="Comments"></textarea>
+                </label>
+                <label class="item item-input">
+                    <textarea placeholder="Comments 2"></textarea>
+                </label>
+            </div>
         </ion-content>
     </ion-view>
 </script>

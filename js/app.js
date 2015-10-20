@@ -86,6 +86,9 @@ app.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
             url: '/form-recipe/categoryId-:categoryId',
             templateUrl: 'form-recipe.tpl',
             controller: 'FormRecipeCtrl'
+        }).state('test', {
+            url: '/test',
+            templateUrl: 'test.tpl'
         });
 });
 
