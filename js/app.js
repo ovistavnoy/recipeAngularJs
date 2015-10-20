@@ -272,8 +272,9 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
                 }
 
                 function onCopySuccess(entry) {
-                    $scope.status = 'photo moved!';
+                    $scope.status = 'photo moved! ';
                     $scope.$apply(function () {
+                        $scope.status += urlForImage(entry.nativeURL);
                         $scope.images.push({src: urlForImage(entry.nativeURL), name: entry.nativeURL});
                     });
                 }
