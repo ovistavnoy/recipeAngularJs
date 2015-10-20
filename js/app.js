@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ionic', 'ngCordova', 'ngStorage']);
+var app = angular.module('app', ['ionic', 'ngCordova', 'ngStorage', 'ion-gallery']);
 
 app.constant('categoriesConstant', [
     {id: 1, name: 'Торты'},
@@ -198,12 +198,15 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
         $scope.submited = false;
         $scope.categories = CategoryService.getCategories();
         $scope.action = 'create';
+        $scope.images = [];
+        $scope.status = 'not upload';
 
         if($stateParams.categoryId != undefined) {
             $scope.recipe = {categoryId: parseInt($stateParams.categoryId)};
         }
         if($stateParams.recipeId != undefined) {
             $scope.recipe = RecipeService.getRecipes({'ids': [parseInt($stateParams.recipeId)]})[0];
+            $scope.images = $scope.recipe.images;
             $scope.action = 'edit';
         }
         $scope.reset = function() {
@@ -215,6 +218,7 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
             if (recipeForm.$valid) {
                 var recipeId;
                 if(data.used == undefined) data.used = false;
+                data.images = $scope.images;
                 if(data.id) {
                     recipeId = RecipeService.updateRecipe(data);
                 } else {
@@ -224,24 +228,20 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
             }
         };
 
-
-        $scope.images = [];
-        $scope.status = 'not upload';
+        $scope.removeImage = function(index) {
+            RecipeService.removeImage($scope.images[index].name);
+            $scope.images.splice(index, 1);
+        };
 
         $scope.capturePhoto = function() {
-            // 2
             var options = {
                 destinationType : Camera.DestinationType.FILE_URI,
                 sourceType : Camera.PictureSourceType.CAMERA, // Camera.PictureSourceType.PHOTOLIBRARY
                 allowEdit : false,
                 encodingType: Camera.EncodingType.JPEG,
-                popoverOptions: CameraPopoverOptions,
+                popoverOptions: CameraPopoverOptions
             };
-
-            // 3
             $cordovaCamera.getPicture(options).then(function(imageData) {
-
-                // 4
                 onImageSuccess(imageData);
 
                 function onImageSuccess(fileURI) {
@@ -253,7 +253,6 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
                     window.resolveLocalFileSystemURL(fileURI, copyFile, fail);
                 }
 
-                // 5
                 function copyFile(fileEntry) {
                     var name = fileEntry.fullPath.substr(fileEntry.fullPath.lastIndexOf('/') + 1);
                     var newName = makeid() + name;
@@ -269,11 +268,10 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
                         fail);
                 }
 
-                // 6
                 function onCopySuccess(entry) {
                     $scope.status = 'photo moved!';
                     $scope.$apply(function () {
-                        $scope.images.push(entry.nativeURL);
+                        $scope.images.push({src: urlForImage(entry.nativeURL), name: entry.nativeURL});
                     });
                 }
 
@@ -297,10 +295,10 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
         };
 
 
-        $scope.urlForImage = function(imageName) {
+        function urlForImage(imageName) {
             var name = imageName.substr(imageName.lastIndexOf('/') + 1);
             return cordova.file.dataDirectory + name;
-        };
+        }
 
 
 
@@ -425,6 +423,11 @@ app.service('RecipeService', function (categoriesConstant, $localStorage) {
             removeRecipe: function(id) {
                 for(var i=0; i<$localStorage.recipes.length; i++) {
                     if($localStorage.recipes[i].id == id) {
+                        if($localStorage.recipes[i].images != undefined) {
+                            for(var j=0; j<$localStorage.recipes[i].images.length; j++) {
+                                this.removeImage($localStorage.recipes[i].images[i].name);
+                            }
+                        }
                         $localStorage.recipes.splice(i, 1);
                         break;
                     }
@@ -454,6 +457,14 @@ app.service('RecipeService', function (categoriesConstant, $localStorage) {
                     }
                 }
                 return result;
+            },
+            removeImage: function(name) {
+                $cordovaFile.removeFile(cordova.file.dataDirectory, name)
+                    .then(function (success) {
+
+                    }, function (error) {
+
+                    });
             }
         }
     }
