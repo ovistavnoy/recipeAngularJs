@@ -198,7 +198,6 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
         $scope.submited = false;
         $scope.categories = CategoryService.getCategories();
         $scope.action = 'create';
-        $scope.images = [];
 
         if($stateParams.categoryId != undefined) {
             $scope.recipe = {categoryId: parseInt($stateParams.categoryId)};
@@ -225,49 +224,128 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
             }
         };
 
+
+        $scope.images = [];
         $scope.status = 'not upload';
+
         $scope.capturePhoto = function() {
-            try {
-                var options = {
-                    quality: 100,
-                    destinationType: Camera.DestinationType.FILE_URI,
-                    sourceType: Camera.PictureSourceType.CAMERA,
-                    encodingType: Camera.EncodingType.JPEG,
-                    cameraDirection: 1,
-                    saveToPhotoAlbum: true
-                };
+            // 2
+            var options = {
+                destinationType : Camera.DestinationType.FILE_URI,
+                sourceType : Camera.PictureSourceType.CAMERA, // Camera.PictureSourceType.PHOTOLIBRARY
+                allowEdit : false,
+                encodingType: Camera.EncodingType.JPEG,
+                popoverOptions: CameraPopoverOptions,
+            };
 
-                $cordovaCamera.getPicture(options).then(function(imagePath){
-                    $scope.status = 'photo upload in temp directory';
+            // 3
+            $cordovaCamera.getPicture(options).then(function(imageData) {
 
-                    //Grab the file name of the photo in the temporary directory
-                    var currentName = imagePath.replace(/^.*[\\\/]/, '');
+                // 4
+                onImageSuccess(imageData);
 
-                    //Create a new name for the photo
-                    var d = new Date(),
-                        n = d.getTime(),
-                        newFileName = n + ".jpg";
+                function onImageSuccess(fileURI) {
+                    $scope.status = 'got image!';
+                    createFileEntry(fileURI);
+                }
 
-                    //Move the file to permanent storage
-                    $cordovaFile.moveFile(cordova.file.tempDirectory, currentName, cordova.file.dataDirectory, newFileName).then(function(success){
-                        $scope.status = 'photo moved in app by url: '+success.nativeURL;
-                        $scope.images.push(success.nativeURL);
-                        //success.nativeURL will contain the path to the photo in permanent storage, do whatever you wish with it, e.g:
-                        //createPhoto(success.nativeURL);
+                function createFileEntry(fileURI) {
+                    window.resolveLocalFileSystemURL(fileURI, copyFile, fail);
+                }
 
-                    }, function(error){
-                        $scope.status = 'photo move error';
-                        //an error occured
+                // 5
+                function copyFile(fileEntry) {
+                    var name = fileEntry.fullPath.substr(fileEntry.fullPath.lastIndexOf('/') + 1);
+                    var newName = makeid() + name;
+
+                    window.resolveLocalFileSystemURL(cordova.file.dataDirectory, function(fileSystem2) {
+                            fileEntry.copyTo(
+                                fileSystem2,
+                                newName,
+                                onCopySuccess,
+                                fail
+                            );
+                        },
+                        fail);
+                }
+
+                // 6
+                function onCopySuccess(entry) {
+                    $scope.status = 'photo moved!';
+                    $scope.$apply(function () {
+                        $scope.images.push(entry.nativeURL);
                     });
+                }
 
-                }, function(error){
-                    $scope.status = 'photo upload error';
-                    //An error occured
-                });
-            } catch (err) {
-                alert(err.message)
-            }
+                function fail(error) {
+                    $scope.status = 'ERROR: photo moved!';
+                }
+
+                function makeid() {
+                    var text = "";
+                    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+                    for (var i=0; i < 5; i++) {
+                        text += possible.charAt(Math.floor(Math.random() * possible.length));
+                    }
+                    return text;
+                }
+
+            }, function(err) {
+                $scope.status = 'ERROR: get image!';
+            });
         };
+
+
+        $scope.urlForImage = function(imageName) {
+            var name = imageName.substr(imageName.lastIndexOf('/') + 1);
+            return cordova.file.dataDirectory + name;
+        };
+
+
+
+        //$scope.capturePhoto = function() {
+        //    try {
+        //        var options = {
+        //            quality: 100,
+        //            destinationType: Camera.DestinationType.FILE_URI,
+        //            sourceType: Camera.PictureSourceType.CAMERA,
+        //            encodingType: Camera.EncodingType.JPEG,
+        //            cameraDirection: 1,
+        //            saveToPhotoAlbum: true
+        //        };
+        //
+        //        $cordovaCamera.getPicture(options).then(function(imagePath){
+        //            $scope.status = 'photo upload in temp directory';
+        //
+        //            //Grab the file name of the photo in the temporary directory
+        //            var currentName = imagePath.replace(/^.*[\\\/]/, '');
+        //
+        //            //Create a new name for the photo
+        //            var d = new Date(),
+        //                n = d.getTime(),
+        //                newFileName = n + ".jpg";
+        //
+        //            //Move the file to permanent storage
+        //            $cordovaFile.moveFile(cordova.file.tempDirectory, currentName, cordova.file.dataDirectory, newFileName).then(function(success){
+        //                $scope.status = 'photo moved in app by url: '+success.nativeURL;
+        //                $scope.images.push(success.nativeURL);
+        //                //success.nativeURL will contain the path to the photo in permanent storage, do whatever you wish with it, e.g:
+        //                //createPhoto(success.nativeURL);
+        //
+        //            }, function(error){
+        //                $scope.status = 'photo move error';
+        //                //an error occured
+        //            });
+        //
+        //        }, function(error){
+        //            $scope.status = 'photo upload error';
+        //            //An error occured
+        //        });
+        //    } catch (err) {
+        //        alert(err.message)
+        //    }
+        //};
 
     }
 ]);
