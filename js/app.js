@@ -267,9 +267,8 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
         };
 
         $scope.removeImage = function(index) {
-            if(RecipeService.removeImage($scope.images[index].name)) {
-                $scope.images.splice(index, 1);
-            }
+            $scope.status = RecipeService.removeImage($scope.images[index].name);
+            $scope.images.splice(index, 1);
         };
 
         $scope.showPopup = function() {
@@ -280,7 +279,9 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
                 title: 'Добавить фото',
                 scope: $scope,
                 buttons: [
-                    { text: 'Отмена' },
+                    {
+                        text: 'Отмена'
+                    },
                     {
                         text: '<b>Далее</b>',
                         type: 'button-positive',
@@ -291,7 +292,9 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
                 ]
             });
             myPopup.then(function(method) {
-                capturePhoto(method);
+                if(method != undefined) {
+                    capturePhoto(method);
+                }
             });
         };
 
@@ -368,8 +371,7 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
             }, function(err) {
                 $scope.status = 'ERROR: get image!';
             });
-        };
-
+        }
 
         function urlForImage(imageName) {
             var name = imageName.substr(imageName.lastIndexOf('/') + 1);
@@ -490,12 +492,17 @@ app.service('RecipeService', function (categoriesConstant, $localStorage, $cordo
                 return result;
             },
             removeImage: function(name) {
-                $cordovaFile.removeFile(cordova.file.dataDirectory, name)
-                    .then(function (success) {
-                        return true;
-                    }, function (error) {
-                        return false;
-                    });
+                try{
+                    $cordovaFile.removeFile(cordova.file.dataDirectory, name)
+                        .then(function (success) {
+                            return 'Remove OK!';
+                        }, function (error) {
+                            return 'Dont remove';
+                        });
+                } catch (e) {
+                    return e.message;
+                }
+
             }
         }
     }
