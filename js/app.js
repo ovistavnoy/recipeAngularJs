@@ -43,6 +43,41 @@ app.directive('focusMe', function($timeout) {
     };
 });
 
+app.directive('rowdecrement', function () {
+    return {
+        restrict: 'A',
+        link: function (scope, element, attrs) {
+            var rowsDecrement = parseInt(attrs['rowdecrement']),
+                rowsBlur = parseInt(attrs.rows),
+                rowsFocus = parseInt(attrs.rows) + rowsDecrement;
+            if (element.val()) {
+                element.attr('rows', rowsFocus);
+            }
+            element.bind('keyup', function () {
+                scope.$apply(function () {
+                    if (!element.val()) {
+                        element.attr('rows', rowsBlur);
+                    } else {
+                        element.attr('rows', rowsFocus);
+                    }
+                });
+            });
+            element.bind('focus', function () {
+                scope.$apply(function () {
+                    if (element.val()) {
+                        element.attr('rows', rowsFocus);
+                    }
+                });
+            });
+            element.bind('blur', function () {
+                scope.$apply(function () {
+                    element.attr('rows', rowsBlur);
+                });
+            });
+        }
+    }
+});
+
 app.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
     $ionicConfigProvider.views.maxCache(0);
     $urlRouterProvider.otherwise('/');
@@ -196,8 +231,8 @@ app.controller('RecipeCtrl', ['$scope', '$window', '$stateParams', 'RecipeServic
     }
 ]);
 
-app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', '$state', '$stateParams', '$cordovaCamera', '$cordovaFile',
-    function($scope, RecipeService, CategoryService, $state, $stateParams, $cordovaCamera, $cordovaFile) {
+app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', '$state', '$stateParams', '$cordovaCamera', '$ionicPopup', '$timeout',
+    function($scope, RecipeService, CategoryService, $state, $stateParams, $cordovaCamera, $ionicPopup, $timeout) {
         $scope.submited = false;
         $scope.categories = CategoryService.getCategories();
         $scope.action = 'create';
@@ -232,19 +267,56 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
         };
 
         $scope.removeImage = function(index) {
-            RecipeService.removeImage($scope.images[index].name);
-            $scope.images.splice(index, 1);
+            if(RecipeService.removeImage($scope.images[index].name)) {
+                $scope.images.splice(index, 1);
+            }
         };
 
-        $scope.capturePhoto = function() {
-            var options = {
-                destinationType : Camera.DestinationType.FILE_URI,
-                sourceType : Camera.PictureSourceType.CAMERA, // Camera.PictureSourceType.PHOTOLIBRARY
-                allowEdit : false,
+        $scope.showPopup = function() {
+            $scope.data = {method: 'takePhoto'};
+
+            var myPopup = $ionicPopup.show({
+                template: '<ion-radio ng-model="data.method" ng-value="\'takePhoto\'">Сделать снимок</ion-radio> <ion-radio ng-model="data.method" ng-value="\'takeGallery\'">Взять из галереи</ion-radio>',
+                title: 'Добавить фото',
+                scope: $scope,
+                buttons: [
+                    { text: 'Отмена' },
+                    {
+                        text: '<b>Далее</b>',
+                        type: 'button-positive',
+                        onTap: function(e) {
+                            return $scope.data.method;
+                        }
+                    }
+                ]
+            });
+            myPopup.then(function(method) {
+                capturePhoto(method);
+            });
+        };
+
+        function getOptions(type) {
+            var source;
+            switch (type) {
+                case 'takePhoto':
+                    source = Camera.PictureSourceType.CAMERA;
+                    break;
+                case 'takeGallery':
+                    source = Camera.PictureSourceType.PHOTOLIBRARY;
+                    break;
+            }
+            return {
+                destinationType: Camera.DestinationType.FILE_URI,
+                sourceType: source,
+                allowEdit: false,
                 encodingType: Camera.EncodingType.JPEG,
-                popoverOptions: CameraPopoverOptions
+                popoverOptions: CameraPopoverOptions,
+                saveToPhotoAlbum: false
             };
-            $cordovaCamera.getPicture(options).then(function(imageData) {
+        }
+
+        function capturePhoto(method) {
+            $cordovaCamera.getPicture(getOptions(method)).then(function(imageData) {
                 onImageSuccess(imageData);
 
                 function onImageSuccess(fileURI) {
@@ -304,51 +376,6 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
             return cordova.file.dataDirectory + name;
         }
 
-
-
-        //$scope.capturePhoto = function() {
-        //    try {
-        //        var options = {
-        //            quality: 100,
-        //            destinationType: Camera.DestinationType.FILE_URI,
-        //            sourceType: Camera.PictureSourceType.CAMERA,
-        //            encodingType: Camera.EncodingType.JPEG,
-        //            cameraDirection: 1,
-        //            saveToPhotoAlbum: true
-        //        };
-        //
-        //        $cordovaCamera.getPicture(options).then(function(imagePath){
-        //            $scope.status = 'photo upload in temp directory';
-        //
-        //            //Grab the file name of the photo in the temporary directory
-        //            var currentName = imagePath.replace(/^.*[\\\/]/, '');
-        //
-        //            //Create a new name for the photo
-        //            var d = new Date(),
-        //                n = d.getTime(),
-        //                newFileName = n + ".jpg";
-        //
-        //            //Move the file to permanent storage
-        //            $cordovaFile.moveFile(cordova.file.tempDirectory, currentName, cordova.file.dataDirectory, newFileName).then(function(success){
-        //                $scope.status = 'photo moved in app by url: '+success.nativeURL;
-        //                $scope.images.push(success.nativeURL);
-        //                //success.nativeURL will contain the path to the photo in permanent storage, do whatever you wish with it, e.g:
-        //                //createPhoto(success.nativeURL);
-        //
-        //            }, function(error){
-        //                $scope.status = 'photo move error';
-        //                //an error occured
-        //            });
-        //
-        //        }, function(error){
-        //            $scope.status = 'photo upload error';
-        //            //An error occured
-        //        });
-        //    } catch (err) {
-        //        alert(err.message)
-        //    }
-        //};
-
     }
 ]);
 
@@ -373,7 +400,7 @@ app.service('CategoryService', function (categoriesConstant, RecipeService) {
     }
 });
 
-app.service('RecipeService', function (categoriesConstant, $localStorage) {
+app.service('RecipeService', function (categoriesConstant, $localStorage, $cordovaFile) {
         if ($localStorage.recipes == undefined)
             $localStorage.$reset({recipes: [], lastId: 0});
         return {
@@ -465,9 +492,9 @@ app.service('RecipeService', function (categoriesConstant, $localStorage) {
             removeImage: function(name) {
                 $cordovaFile.removeFile(cordova.file.dataDirectory, name)
                     .then(function (success) {
-
+                        return true;
                     }, function (error) {
-
+                        return false;
                     });
             }
         }
