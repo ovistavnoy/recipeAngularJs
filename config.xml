@@ -6,7 +6,7 @@
         versionCode = "0.5.5"
         version     = "0.5.5" >
 
-    <name>Recipe ionic App</name>
+    <name>Мои рецепты</name>
 
     <description>
         Cool app.

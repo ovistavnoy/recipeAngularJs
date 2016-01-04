@@ -13,8 +13,9 @@
       restrict: 'AE',
       scope:{
         ionGalleryItems: '=ionGalleryItems',
-        ionGalleryRow: '=ionGalleryRow',
-        ionGalleryImageRemove: '=ionGalleryImageRemove'
+        ionRemoveImage: '=ionRemoveImage',
+        ionGalleryRow: '=ionGalleryRow'
+        //ionGalleryImageRemove: '=ionGalleryImageRemove'
       },
       controller: controller,
       link:link,
@@ -297,6 +298,7 @@
     function controller($scope){
       var lastSlideIndex;
       var currentImage;
+        //console.log($scope.ionGalleryItems);
       
       var rowSize = ionGalleryData.getRowSize();
       var zoomStart = false;
@@ -306,7 +308,22 @@
       $scope.canRemove = ionGalleryData.canRemove();
 
       $scope.removeImage = function(index) {
-        ionGalleryData.doImageRemove(index)
+        var nextSlide = index;
+        if($scope.ionGalleryItems.length == 1) {
+          $scope.closeModal();
+        } else if($scope.ionGalleryItems.length-1 == index) {
+          nextSlide = 0;
+        }
+
+        $scope.ionGalleryItems.splice(index, 1);
+
+        $scope.showImage(0, nextSlide);
+        //ionGalleryData.doImageRemove(index);
+
+      };
+
+      $scope.onHold = function(row,col) {
+        $scope.ionRemoveImage(row*$scope.ionGalleryRow + col)
       };
 
       $scope.showImage = function(row,col) {
@@ -331,7 +348,7 @@
         $scope.slides[1] = $scope.ionGalleryItems[index];
         $scope.slides[2] = $scope.ionGalleryItems[nextindex];
         
-        console.log( 'loadSingles: ' + previndex + ' ' + index + ' ' + nextindex);
+        //console.log( 'loadSingles: ' + previndex + ' ' + index + ' ' + nextindex);
 
         lastSlideIndex = 1;
         $scope.loadModal();
@@ -339,7 +356,8 @@
 
 
       $scope.slideChanged = function(currentSlideIndex) {
-        
+          //console.log($scope.slides)
+        $scope.currentSlideIndex = currentSlideIndex;
         if(currentSlideIndex === lastSlideIndex){
           return;
         }
@@ -348,7 +366,7 @@
         var galleryLength = ionGalleryData.getGalleryLength();
         var imageToLoad;
         
-        console.log( 'loadSingles: ' + lastSlideIndex + ' > ' + currentSlideIndex);
+        //console.log( 'loadSingles: ' + lastSlideIndex + ' > ' + currentSlideIndex);
         
         switch( lastSlideIndex + '>' + currentSlideIndex ) {
           case '0>1':
@@ -481,6 +499,7 @@
 
     function link(scope, element, attrs) {
       var _modal;
+       // console.log(scope);
 
       scope.loadModal = function(){
         $ionicModal.fromTemplateUrl('slider.html', {
@@ -508,5 +527,5 @@
     }
   }
 })();
-angular.module("templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("gallery.html","<div class=\"gallery-view\">\n  <div class=\"row\" ng-repeat=\"item in items track by $index\" ion-row-height>\n    <div ng-repeat=\"photo in item track by $index\"\n         class=\"col col-{{responsiveGrid}} image-container\">\n      \n      <img ion-image-scale\n           ng-src=\"{{photo.src}}\"\n           ng-click=\"showImage({{$parent.$index}},{{$index}})\">\n <a ng-show=\"canRemove\" href=\"\" ng-click=\"removeImage({{$index}})\" class=\"ion-close-circled recipe-image-remove\"></a>      \n    </div>\n  </div>\n  <div ion-slider></div>\n</div>");
-$templateCache.put("slider.html","<ion-modal-view class=\"blackBackground imageView\">\n  <ion-header-bar class=\"headerView\" ng-show=\"!hideAll\">\n    <button class=\"button button-outline button-light close-btn\" ng-click=\"closeModal()\">X</button>\n  </ion-header-bar>\n    \n  <ion-content class=\"has-no-header\" scroll=\"false\">\n    <ion-slide-box does-continue=\"true\" active-slide=\"selectedSlide\" show-pager=\"false\" class=\"listContainer\" on-slide-changed=\"slideChanged($index)\">\n      <ion-slide ng-repeat=\"single in slides track by $index\">\n        <ion-scroll direction=\"xy\"\n                    locking=\"false\" \n                    zooming=\"true\"\n                    min-zoom=\"1\"\n                    scrollbar-x=\"false\"\n                    scrollbar-y=\"false\"\n                    ion-slide-action\n                    delegate-handle=\"slide-{{$index}}\"\n                    >\n        <div class=\"item item-image centerPictureVertical gallery-slide-view\">\n          <img ng-src=\"{{single.src}}\">\n        </div>\n        <div ng-if=\"single.sub.length > 0\" class=\"image-subtitle\" ng-show=\"!hideAll\">\n            <span ng-bind-html=\'single.sub\'></span>\n        </div>\n        </ion-scroll>\n      </ion-slide>\n    </ion-slide-box>\n  </ion-content>\n</ion-modal-view>");}]);
+angular.module("templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("gallery.html","<div class=\"gallery-view\">\n  <div class=\"row\" ng-repeat=\"item in items track by $index\" ion-row-height>\n    <div ng-repeat=\"photo in item track by $index\"\n         class=\"col col-{{responsiveGrid}} image-container\">\n      \n      <img ion-image-scale\n           ng-src=\"{{photo.src}}\"\n      on-hold=\"onHold({{$parent.$index}},{{$index}})\"     ng-click=\"showImage({{$parent.$index}},{{$index}})\">\n       \n    </div>\n  </div>\n  <div ion-slider></div>\n</div>");
+$templateCache.put("slider.html","<ion-modal-view class=\"blackBackground imageView\">\n  <ion-header-bar class=\"headerView\" ng-show=\"!hideAll\">\n  <!--button style=\"position: relative\" class=\"button button-outline button-light close-btn\" ng-show=\"canRemove\" ng-click=\"removeImage({{currentSlideIndex}})\">Удалить</button-->  <button class=\"button button-outline button-light close-btn\" ng-click=\"closeModal()\">Закрыть</button>\n  </ion-header-bar>\n    \n  <ion-content class=\"has-no-header\" scroll=\"false\">\n    <ion-slide-box does-continue=\"true\" active-slide=\"selectedSlide\" show-pager=\"false\" class=\"listContainer\" on-slide-changed=\"slideChanged($index)\">\n      <ion-slide ng-repeat=\"single in slides track by $index\">\n        <ion-scroll direction=\"xy\"\n                    locking=\"false\" \n                    zooming=\"true\"\n                    min-zoom=\"1\"\n                    scrollbar-x=\"false\"\n                    scrollbar-y=\"false\"\n                    ion-slide-action\n                    delegate-handle=\"slide-{{$index}}\"\n                    >\n        <div class=\"item item-image centerPictureVertical gallery-slide-view\">\n          <img ng-src=\"{{single.src}}\">\n        </div>\n        <div ng-if=\"single.sub.length > 0\" class=\"image-subtitle\" ng-show=\"!hideAll\">\n            <span ng-bind-html=\'single.sub\'></span>\n        </div>\n        </ion-scroll>\n      </ion-slide>\n    </ion-slide-box>\n  </ion-content>\n</ion-modal-view>");}]);

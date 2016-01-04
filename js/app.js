@@ -80,7 +80,7 @@ app.directive('rowdecrement', function () {
 
 app.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
     $ionicConfigProvider.views.maxCache(0);
-    $urlRouterProvider.otherwise('/');
+
     $stateProvider
         .state('home', {
             url: '/',
@@ -124,6 +124,10 @@ app.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
         }).state('test', {
             url: '/test',
             templateUrl: 'test.tpl'
+        }).state("otherwise", {
+            url: '',
+            templateUrl: 'home.tpl',
+            controller: 'HomeCtrl'
         });
 });
 
@@ -217,6 +221,21 @@ app.controller('RecipeCtrl', ['$scope', '$window', '$stateParams', 'RecipeServic
             });
         };
 
+      $scope.removeImage = function(index) {
+          var confirmPopup = $ionicPopup.confirm({
+            title: 'Удаление фото',
+            template: 'Вы уверены что хотите удалить это фото?'
+          });
+          confirmPopup.then(function(res) {
+            if(res) {
+              RecipeService.removeImage($scope.recipe.images[index].name);
+              $scope.recipe.images.splice(index, 1);
+            }
+          });
+
+
+      };
+
         $scope.toggleFavorite = function() {
             if($scope.recipe.isFav)
                 RecipeService.removeFromFavRecipe($scope.recipe.id);
@@ -237,6 +256,13 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
         $scope.categories = CategoryService.getCategories();
         $scope.action = 'create';
         $scope.images = [];
+        $scope.images = [
+            {src: 'img/test1.jpg', name: 'test1'},
+            {src: 'img/test2.jpg', name: 'test2'},
+            {src: 'img/test3.jpg', name: 'test3'},
+            {src: 'img/test4.jpg', name: 'test4'},
+            {src: 'img/test5.jpg', name: 'test5'}
+        ];
         $scope.status = 'not upload';
 
         if($stateParams.categoryId != undefined) {
@@ -267,8 +293,16 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
         };
 
         $scope.removeImage = function(index) {
-            $scope.status = RecipeService.removeImage($scope.images[index].name);
-            $scope.images.splice(index, 1);
+            var confirmPopup = $ionicPopup.confirm({
+                title: 'Удаление фото',
+                template: 'Вы уверены что хотите удалить это фото?'
+            });
+            confirmPopup.then(function(res) {
+                if(res) {
+                    RecipeService.removeImage($scope.images[index].name);
+                    $scope.images.splice(index, 1);
+                }
+            });
         };
 
         $scope.showPopup = function() {
@@ -494,13 +528,9 @@ app.service('RecipeService', function (categoriesConstant, $localStorage, $cordo
             removeImage: function(name) {
                 try{
                     $cordovaFile.removeFile(cordova.file.dataDirectory, name)
-                        .then(function (success) {
-                            return 'Remove OK!';
-                        }, function (error) {
-                            return 'Dont remove';
-                        });
+                        .then(function (success) { }, function (error) { });
                 } catch (e) {
-                    return e.message;
+                    console.log(e.message);
                 }
 
             }

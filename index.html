@@ -59,10 +59,10 @@
             <i class="icon ion-navicon-round"></i>
             Каталог рецептов
         </a>
-        <!--<a class="tab-item" href="#/test">-->
-            <!--<i class="icon ion-social-codepen-outline"></i>-->
-            <!--Тест формы-->
-        <!--</a>-->
+        <a class="tab-item" href="#/test">
+            <i class="icon ion-social-codepen-outline"></i>
+            Тест формы
+        </a>
         <a class="tab-item" ng-click="clearBase()">
             <i class="icon ion-trash-a"></i>
             Очистить базу
@@ -163,7 +163,7 @@
             <span><b>Описание:</b> <p ng-bind-html="recipe.description | nl2br"></p></span>
             <span ng-if="recipe.comment"><b>Комментарий:</b> <p ng-bind-html="recipe.comment | nl2br"></p></span>
             <b>Пробовал Олежка?</b> {{recipe.usedText}}<br>
-            <ion-gallery ion-gallery-items="recipe.images" ion-gallery-row="4"></ion-gallery>
+            <ion-gallery ion-gallery-items="recipe.images" ion-remove-image="removeImage" ion-gallery-row="4"></ion-gallery>
         </ion-content>
     </ion-view>
 </script>
@@ -267,7 +267,7 @@
                     {{status}}
                 </label>
 
-                <ion-gallery ion-gallery-items="images" ion-gallery-image-remove="removeImage" ion-gallery-row="4"></ion-gallery>
+                <ion-gallery ion-gallery-items="images" ion-remove-image="removeImage" ion-gallery-row="4"></ion-gallery>
 
                 <div class="buttons text-right padding">
                     <button ng-click="reset()" class="button button-default">Очистить форму</button>
