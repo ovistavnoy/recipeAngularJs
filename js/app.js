@@ -256,13 +256,13 @@ app.controller('FormRecipeCtrl', ['$scope', 'RecipeService', 'CategoryService', 
         $scope.categories = CategoryService.getCategories();
         $scope.action = 'create';
         $scope.images = [];
-        $scope.images = [
-            {src: 'img/test1.jpg', name: 'test1'},
-            {src: 'img/test2.jpg', name: 'test2'},
-            {src: 'img/test3.jpg', name: 'test3'},
-            {src: 'img/test4.jpg', name: 'test4'},
-            {src: 'img/test5.jpg', name: 'test5'}
-        ];
+        //$scope.images = [
+        //    {src: 'img/test1.jpg', name: 'test1'},
+        //    {src: 'img/test2.jpg', name: 'test2'},
+        //    {src: 'img/test3.jpg', name: 'test3'},
+        //    {src: 'img/test4.jpg', name: 'test4'},
+        //    {src: 'img/test5.jpg', name: 'test5'}
+        //];
         $scope.status = 'not upload';
 
         if($stateParams.categoryId != undefined) {
